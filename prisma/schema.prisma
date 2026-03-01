@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Box {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  subtitle     String?
+  description  String
+  priceUah     Int
+  coverImage   String
+  gallery      String   @default("[]")
+  category     String
+  forWhom      String   @default("all")
+  occasion     String   @default("any")
+  interests    String   @default("[]")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PromoCode {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  type         String
+  value        Int
+  maxUses      Int      @default(0)
+  usedCount    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  boxId         String
+  boxTitle      String
+  boxPriceUah   Int
+  finalPriceUah Int
+  promoCode     String?
+  customerName  String
+  phone         String
+  contactPref   String
+  city          String
+  delivery      String
+  branch        String
+  comment       String?
+  status        String   @default("NEW")
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+}
