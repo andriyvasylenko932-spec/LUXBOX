@@ -1,0 +1,26 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f5d27a"/>
+      <stop offset="0.4" stop-color="#d4a646"/>
+      <stop offset="1" stop-color="#fff1b8"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0b10"/>
+      <stop offset="1" stop-color="#1a1a24"/>
+    </linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000" flood-opacity="0.20"/>
+    </filter>
+  </defs>
+
+  <rect x="18" y="18" width="220" height="220" rx="64" fill="url(#ink)" filter="url(#shadow)"/>
+  <!-- Monogram L -->
+  <path d="M92 78v108c0 6 3 9 9 9h60" fill="none" stroke="url(#gold)" stroke-width="14" stroke-linecap="round"/>
+  <!-- Box lid line -->
+  <path d="M92 108h88" fill="none" stroke="url(#gold)" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+  <!-- small UA mark (minimal) -->
+  <rect x="76" y="198" width="104" height="10" rx="5" fill="#0057B7" opacity="0.95"/>
+  <rect x="76" y="210" width="104" height="10" rx="5" fill="#FFD700" opacity="0.95"/>
+</svg>
+
