@@ -1,9 +1,11 @@
-generator client {
+﻿generator client {
   provider = "prisma-client-js"
+
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -56,3 +58,4 @@ model Order {
 
   @@index([createdAt])
 }
+
