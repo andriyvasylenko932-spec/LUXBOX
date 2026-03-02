@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
+﻿import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-function safeName(name: string) {
-  return name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+async function sha1Hex(input: string) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest("SHA-1", enc.encode(input));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export async function POST(req: Request) {
@@ -18,28 +18,48 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Потрібне зображення (data:image/...)" }, { status: 400 });
     }
 
-    const base64 = dataUrl.split(",")[1] || "";
-    const buffer = Buffer.from(base64, "base64");
-
-    if (buffer.length > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "Файл завеликий (макс 5MB)" }, { status: 400 });
+    const cloud = process.env.CLOUDINARY_CLOUD_NAME || "";
+    const key = process.env.CLOUDINARY_API_KEY || "";
+    const secret = process.env.CLOUDINARY_API_SECRET || "";
+    if (!cloud || !key || !secret) {
+      return NextResponse.json({ error: "Cloudinary env missing" }, { status: 500 });
     }
 
-    const lower = filename.toLowerCase();
-    const ext =
-      lower.endsWith(".png") ? ".png" :
-      (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) ? ".jpg" :
-      lower.endsWith(".webp") ? ".webp" : ".png";
+    const folder = "luxbox";
+    const timestamp = Math.floor(Date.now() / 1000);
 
-    const stamp = Date.now();
-    const finalName = `${safeName(path.parse(filename).name)}-${stamp}${ext}`;
+    const baseName = filename
+      .replace(/\.[^.]+$/, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, finalName), buffer);
+    const publicId = `${folder}/${baseName}-${Date.now()}`;
 
-    return NextResponse.json({ url: `/uploads/${finalName}` });
-  } catch (e) {
+    const toSign = `folder=${folder}&public_id=${publicId}&timestamp=${timestamp}${secret}`;
+    const signature = await sha1Hex(toSign);
+
+    const form = new URLSearchParams();
+    form.set("file", dataUrl);
+    form.set("api_key", key);
+    form.set("timestamp", String(timestamp));
+    form.set("folder", folder);
+    form.set("public_id", publicId);
+    form.set("signature", signature);
+
+    const up = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, {
+      method: "POST",
+      body: form
+    });
+
+    const j = await up.json();
+    if (!up.ok) {
+      return NextResponse.json({ error: j?.error?.message || "Cloudinary upload failed" }, { status: 500 });
+    }
+
+    return NextResponse.json({ url: j.secure_url });
+  } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
