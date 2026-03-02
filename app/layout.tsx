@@ -5,10 +5,7 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "LUXBOX",
-  description: "Premium boxes in Ukraine",
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }]
-  }
+  description: "Premium boxes in Ukraine"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
