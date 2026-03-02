@@ -13,8 +13,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="uk">
   <head>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  </head>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+</head>
       <body>
         <Pixel />
         <Header />
@@ -24,4 +24,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+
 
